@@ -1,0 +1,38 @@
+image: docker:latest
+
+variables:
+  DOCKER_HOST: tcp://39.105.5.251:2375
+  TAG: minerunner:v1
+
+stages:
+  - package
+  - develop
+
+.tagsFlag: &tagsFlagDef # 创建一个锚，'tagsFlagDef'
+  tags:
+    - maven
+  only:
+    - master
+    - pro
+
+.imageFlag: &imageFlagDef # 创建一个锚，'imageFlagDef'
+  image: maven:3.5-jdk-8
+  <<: *tagsFlagDef
+
+# 打包
+package:
+  stage: package
+  <<: *imageFlagDef
+  script:
+    - mvn clean package -Dmaven.test.skip=true
+  artifacts:
+    paths:
+      - target/*.jar
+# 部署
+develop:
+  stage: develop
+  <<: *tagsFlagDef
+  script:
+    - docker build -t $TAG .
+    - docker rm -f runnerdemo || true
+    - docker run -d -p 11111:11111 --name runnerdemo $TAG
