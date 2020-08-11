@@ -1,7 +1,7 @@
 image: docker:latest
 
 variables:
-  DOCKER_HOST: tcp://39.105.5.251:2375
+  DOCKER_HOST: tcp://{Docker所在服务器具体IP}:2375
   TAG: minerunner:v1
 
 stages:
